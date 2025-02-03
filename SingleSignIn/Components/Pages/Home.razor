@@ -1,0 +1,26 @@
+﻿@page "/"
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<h1>Welcome</h1>
+
+@if (user != null && user.Identity?.IsAuthenticated == true)
+{
+    <div class="container mt-3">
+        <h2>Hello, @user.Identity.Name!</h2>
+        <div class="mt-4">
+        </div>
+    </div>
+}
+
+@code {
+    private ClaimsPrincipal? user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+    }
+
+}

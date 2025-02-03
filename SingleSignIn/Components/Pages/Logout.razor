@@ -1,0 +1,28 @@
+﻿@page "/logout"
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Sign out from local authentication
+            await HttpContextAccessor.HttpContext!.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
+
+            // Sign out from external providers
+            await HttpContextAccessor.HttpContext.SignOutAsync(
+                GoogleDefaults.AuthenticationScheme
+            );
+
+            // Redirect to home or login page
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}
