@@ -1,0 +1,17 @@
+[33mcommit a99ddaf37a407e8ac64729717a5a05b8686f4d6c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Staging[m[33m, [m[1;32mstaging[m[33m)[m
+Author: Arvind Singh <arvindsingh4767@gmail.com>
+Date:   Tue Feb 4 15:31:40 2025 +0530
+
+    Commit by Arvind and the Chat functionality working and also backgroud add and also SingleSignOn working....
+
+[33mcommit dd27a081b1856bdf0e1546154dad3c913a19bc68[m
+Author: INNODPARM <INNODPARM@NOD-N0224>
+Date:   Mon Feb 3 19:54:48 2025 +0530
+
+    Add project files.
+
+[33mcommit b0f06977680b8fb2d9184cb31a95c763056eaf58[m
+Author: INNODPARM <INNODPARM@NOD-N0224>
+Date:   Mon Feb 3 19:54:45 2025 +0530
+
+    Add .gitattributes and .gitignore.

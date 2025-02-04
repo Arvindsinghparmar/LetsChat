@@ -3,25 +3,38 @@
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 @rendermode InteractiveServer
-
+<PageTitle>Let's Chat</PageTitle>
 <div class="chat-container">
-    <div class="message-list" style="max-height: 300px; overflow-y: auto; margin-inline-end: -13px;">
-        @foreach (var message in messages)
+    <div class="user-list">
+        <h3>Users Online:</h3>
+        @foreach (var user in onlineUsers)
         {
-            <div class="message">
-                <strong>@message.Username:</strong> @message.Content
-            </div>
+                <div class="user" @onclick="() => StartPrivateChat(user)">
+                @user
+                </div>
         }
     </div>
 
-    <div class="input-area">
-        <input type="text" @bind="username" placeholder="Your Name" />
-        <input type="text" @bind="messageInput" @onkeyup="HandleKeyUp" placeholder="Type a message" />
-        <button @onclick="SendMessage">Send</button>
+    <div class="message-container">
+        <div class="message-list" style="max-height: 300px; overflow-y: auto; margin-inline-end: -13px;">
+            @foreach (var message in messages)
+            {
+                    <div class="message">
+                        <strong>@message.Username:</strong> @message.Content
+                    </div>
+            }
+        </div>
+
+        <div class="input-area">
+            <input type="text" @bind="username" placeholder="Your Name" />
+            <input type="text" @bind="messageInput" @onkeyup="HandleKeyUp" placeholder="Type a message" />
+            <button @onclick="SendMessage">Send</button>
+        </div>
     </div>
 </div>
 
 @code {
+    private List<string> onlineUsers = new();
     private HubConnection hubConnection;
     private List<ChatMessage> messages = new();
     private string username = "";
@@ -37,12 +50,21 @@
         {
             var newMessage = new ChatMessage(user, message);
             messages.Add(newMessage);
+            onlineUsers.Add(user);
             InvokeAsync(StateHasChanged);
         });
 
         await hubConnection.StartAsync();
     }
-
+    private void ReceiveOnlineUsers(List<string> users)
+    {
+        onlineUsers = users;
+        InvokeAsync(StateHasChanged);
+    }
+    private void StartPrivateChat(string user)
+    {
+        // Implement the logic to start a private chat with the selected user
+    }
     private async Task SendMessage()
     {
         if (!string.IsNullOrEmpty(messageInput) && !string.IsNullOrEmpty(username))
