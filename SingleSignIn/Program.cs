@@ -17,7 +17,11 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
-.AddCookie()
+.AddCookie(opt=>
+{
+    opt.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+
+})
 .AddGoogle(options =>
 {
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
@@ -26,7 +30,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddRazorPages();
-
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 app.UseAuthentication();
@@ -43,6 +47,7 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapHub<ChatHub>("/chathub");
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

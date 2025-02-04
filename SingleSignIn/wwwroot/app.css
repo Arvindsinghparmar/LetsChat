@@ -1,5 +1,8 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-image: url('pexels-eberhardgross-2310713.jpg');
+    background-size: cover;
+    background-position: center;
 }
 
 a, .btn-link {
@@ -57,4 +60,76 @@ h1:focus {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+.chat-container {
+    max-width: 600px;
+    margin: auto;
+    border: 1px solid #ddd;
+    padding: 15px;
+}
+
+.message-list {
+    height: 400px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.message {
+    margin-bottom: 10px;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+}
+/*----------Chat---*/
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: mediumpurple;
+    background-size: cover;
+    background-position: center;
+    margin-top:90px
+}
+
+.message {
+    background-color: #f2f2f2;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    margin-inline-end: 11px;
+}
+
+.input-area {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+/*-----Whatsaap Icon*/
+.fa-whatsapp:before {
+    content: "\f232";
+    margin-inline-end: 14px;
+    font-size: 26px;
 }

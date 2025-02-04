@@ -1,0 +1,67 @@
+﻿@page "/chat"
+@using SingleSignIn.Models
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+@rendermode InteractiveServer
+
+<div class="chat-container">
+    <div class="message-list" style="max-height: 300px; overflow-y: auto; margin-inline-end: -13px;">
+        @foreach (var message in messages)
+        {
+            <div class="message">
+                <strong>@message.Username:</strong> @message.Content
+            </div>
+        }
+    </div>
+
+    <div class="input-area">
+        <input type="text" @bind="username" placeholder="Your Name" />
+        <input type="text" @bind="messageInput" @onkeyup="HandleKeyUp" placeholder="Type a message" />
+        <button @onclick="SendMessage">Send</button>
+    </div>
+</div>
+
+@code {
+    private HubConnection hubConnection;
+    private List<ChatMessage> messages = new();
+    private string username = "";
+    private string messageInput = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            var newMessage = new ChatMessage(user, message);
+            messages.Add(newMessage);
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrEmpty(messageInput) && !string.IsNullOrEmpty(username))
+        {
+            await hubConnection.SendAsync("SendMessage", username, messageInput);
+            messageInput = "";
+        }
+    }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
+}
