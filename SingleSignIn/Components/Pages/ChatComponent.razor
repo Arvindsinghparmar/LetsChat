@@ -6,7 +6,7 @@
 <PageTitle>Let's Chat</PageTitle>
 <div class="chat-container">
     <div class="user-list">
-        <h4>Users Online:</h4>
+        <h3>Users Online:</h3>
         @foreach (var user in onlineUsers)
         {
                 <div class="user" @onclick="() => StartPrivateChat(user)">
