@@ -1,76 +1,56 @@
 ﻿@page "/chat"
-@using SingleSignIn.Models
+@inject IChatService ChatService
 @inject NavigationManager NavigationManager
-@implements IAsyncDisposable
 @rendermode InteractiveServer
 <PageTitle>Let's Chat</PageTitle>
 <div class="chat-container">
-    <div class="user-list">
-        <h2>Users Online:</h2>
-        @foreach (var user in onlineUsers)
-        {
-                <div class="user" @onclick="() => StartPrivateChat(user)">
-                @user
-                </div>
-        }
-    </div>
-
     <div class="message-container">
         <div class="message-list" style="max-height: 300px; overflow-y: auto; margin-inline-end: -13px;">
             @foreach (var message in messages)
             {
-                    <div class="message">
-                        <strong>@message.Username:</strong> @message.Content
-                    </div>
+                <div class="message">
+                    <strong>@message.Username:</strong> @message.Content:@message.UType
+                </div>
             }
         </div>
-
         <div class="input-area">
-            <input type="text" @bind="username" placeholder="Your Name" />
-            <input type="text" @bind="messageInput" @onkeyup="HandleKeyUp" placeholder="Type a message" />
-            <button @onclick="SendMessage">Send</button>
+            <input type="text" class="form-control" @bind="username" placeholder="Your Name" />
+            <input type="text" class="form-control" @bind="messageInput" @onkeyup="HandleKeyUp" placeholder="Type a message" />
+            <select class="form-control" @bind="UType">
+                <option value="">Select Type</option>
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+            </select>
+            <button class="btn btn-primary" @onclick="SendMessage">Send</button>
         </div>
     </div>
 </div>
 
 @code {
-    private List<string> onlineUsers = new();
-    private HubConnection hubConnection;
     private List<ChatMessage> messages = new();
     private string username = "";
     private string messageInput = "";
+    private string UType = "";
 
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
-            .Build();
+        await ChatService.InitializeHubConnection();
 
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        ChatService.OnReceiveMessage += (user, message, utype) =>
         {
-            var newMessage = new ChatMessage(user, message);
+            var newMessage = new ChatMessage(user, message, utype);
             messages.Add(newMessage);
-            onlineUsers.Add(user);
             InvokeAsync(StateHasChanged);
-        });
+        };
+    }
 
-        await hubConnection.StartAsync();
-    }
-    private void ReceiveOnlineUsers(List<string> users)
-    {
-        onlineUsers = users;
-        InvokeAsync(StateHasChanged);
-    }
-    private void StartPrivateChat(string user)
-    {
-        // Implement the logic to start a private chat with the selected user
-    }
     private async Task SendMessage()
     {
-        if (!string.IsNullOrEmpty(messageInput) && !string.IsNullOrEmpty(username))
+        if (!string.IsNullOrEmpty(messageInput) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(UType))
         {
-            await hubConnection.SendAsync("SendMessage", username, messageInput);
-            messageInput = "";
+            await ChatService.SendMessage(username, messageInput, UType);
+            messageInput = string.Empty;
+            UType = string.Empty;
         }
     }
 
@@ -80,10 +60,5 @@
         {
             await SendMessage();
         }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await hubConnection.DisposeAsync();
     }
 }

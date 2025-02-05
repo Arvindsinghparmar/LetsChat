@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using SingleSignIn.Components;
+using SingleSignIn.Interface;
 using SingleSignIn.Models;
+using SingleSignIn.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +31,7 @@ builder.Services.AddAuthentication(options =>
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
 });
-
+builder.Services.AddTransient<IChatService,ChatService>();
 builder.Services.AddAuthorization();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
