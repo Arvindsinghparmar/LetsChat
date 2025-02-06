@@ -2,8 +2,10 @@
 {
     public interface IChatService
     {
-        event Action<string, string, string> OnReceiveMessage;
+        event Action<string, string> OnReceiveMessage;
         Task InitializeHubConnection();
-        Task SendMessage(string username, string message, string userType);
+        Task SendMessage(string username, string message);
+        Task SendTypingNotification(string username);
+        event Action<string> OnUserTyping;
     }
 }

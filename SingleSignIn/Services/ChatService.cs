@@ -8,19 +8,24 @@ namespace SingleSignIn.Services
 {
     public class ChatService : IChatService, IDisposable
     {
-        public event Action<string, string, string>? OnReceiveMessage;
+        public event Action<string, string>? OnReceiveMessage;
         private readonly HubConnection _hubConnection;
         private readonly NavigationManager _navigationManager;
-
+        public event Action<string> OnUserTyping;
         public ChatService(NavigationManager navigationManager)
         {
             _navigationManager = navigationManager;
             _hubConnection=new HubConnectionBuilder().WithUrl(navigationManager.ToAbsoluteUri("/chathub"))
                 .WithAutomaticReconnect()
                 .Build();
-            _hubConnection.On<string, string, string>("ReceiveMessage", (user, message, utype) =>
+            _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
             {
-                OnReceiveMessage?.Invoke(user, message, utype);
+                OnReceiveMessage?.Invoke(user, message);
+                OnUserTyping?.Invoke("");
+            });
+            _hubConnection.On<string>("ReceiveTypingNotification", (username) =>
+            {
+                OnUserTyping?.Invoke(username);
             });
         }
 
@@ -40,14 +45,22 @@ namespace SingleSignIn.Services
             }
         }
 
-        public async Task SendMessage(string username, string message, string userType)
+        public async Task SendTypingNotification(string user)
+        {
+            if(_hubConnection.State==HubConnectionState.Connected)
+            {
+                await _hubConnection.SendAsync("UserTyping", user);
+            }
+        }
+
+        public async Task SendMessage(string username, string message)
         {
             
             try
             {
                 if (_hubConnection.State == HubConnectionState.Connected)
                 {
-                    await _hubConnection.SendAsync("SendMessage", username, message, userType);
+                    await _hubConnection.SendAsync("SendMessage", username, message);
                 }
                 else
                 {

@@ -1,27 +1,26 @@
 ﻿@page "/chat"
 @inject IChatService ChatService
-@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 <PageTitle>Let's Chat</PageTitle>
 <div class="chat-container">
-    <div class="message-container">
-        <div class="message-list" style="max-height: 300px; overflow-y: auto; margin-inline-end: -13px;">
-            @foreach (var message in messages)
-            {
-                <div class="message">
-                    <strong>@message.Username:</strong> @message.Content:@message.UType
-                </div>
-            }
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            Live Chat
         </div>
-        <div class="input-area">
-            <input type="text" class="form-control" @bind="username" placeholder="Your Name" />
-            <input type="text" class="form-control" @bind="messageInput" @onkeyup="HandleKeyUp" placeholder="Type a message" />
-            <select class="form-control" @bind="UType">
-                <option value="">Select Type</option>
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-            </select>
-            <button class="btn btn-primary" @onclick="SendMessage">Send</button>
+        <div class="card-body chat-container">
+            <ul class="list-group message-list" style="max-height: 300px; overflow-y: auto;">
+                @foreach (var chat in messages)
+                {
+                    <li class="list-group-item">@chat.Username : @chat.Content</li>
+                }
+                <p class="text-muted">@TypingStatus</p>
+            </ul>
+        </div>
+
+        <div class="card-footer">
+            <input class="form-control mb-2" @bind="username" placeholder="Enter Your Name" />
+            <textarea class="form-control mb-2" @bind="messageInput" @oninput="OnMessageTyping" placeholder="Type your message"></textarea>
+            <button class="btn btn-primary w-100" @onclick="SendMessage">Send</button>
         </div>
     </div>
 </div>
@@ -31,26 +30,35 @@
     private string username = "";
     private string messageInput = "";
     private string UType = "";
+    private string TypingStatus = "";
 
     protected override async Task OnInitializedAsync()
     {
         await ChatService.InitializeHubConnection();
 
-        ChatService.OnReceiveMessage += (user, message, utype) =>
+        ChatService.OnReceiveMessage += (user, message) =>
         {
-            var newMessage = new ChatMessage(user, message, utype);
+            var newMessage = new ChatMessage(user, message);
             messages.Add(newMessage);
+            TypingStatus = string.Empty;
             InvokeAsync(StateHasChanged);
         };
+        ChatService.OnUserTyping += (username) =>
+        {
+            TypingStatus = $"{username} is typing...";
+            InvokeAsync(StateHasChanged);
+        };
+    }
+    private async Task OnMessageTyping(){
+        await ChatService.SendTypingNotification(username);
     }
 
     private async Task SendMessage()
     {
-        if (!string.IsNullOrEmpty(messageInput) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(UType))
+        if (!string.IsNullOrEmpty(messageInput) && !string.IsNullOrEmpty(username))
         {
-            await ChatService.SendMessage(username, messageInput, UType);
+            await ChatService.SendMessage(username, messageInput);
             messageInput = string.Empty;
-            UType = string.Empty;
         }
     }
 

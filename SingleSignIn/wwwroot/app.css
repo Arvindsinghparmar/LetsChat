@@ -83,53 +83,40 @@ h1:focus {
     gap: 10px;
 }
 /*----------Chat---*/
+.message-list {
+    padding: 10px;
+    margin: 0;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    background-color: transparent;
+}
+
 .chat-container {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     height: 100%;
-    background-color: mediumpurple;
-    background-size: cover;
-    background-position: center;
-    margin-top:90px
+    width:100%;
 }
-
-.message {
-    background-color: #f2f2f2;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    margin-inline-end: 11px;
-}
-
-.input-area {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-}
-
-input[type="text"] {
-    padding: 10px;
-    margin-right: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-    button:hover {
-        background-color: #0056b3;
-    }
 
 /*-----Whatsaap Icon*/
 .fa-whatsapp:before {
     content: "\f232";
     margin-inline-end: 14px;
     font-size: 26px;
+}
+.chat-window{
+    max-height:400px;
+    overflow-y:auto;
+}
+.list-group-item{
+    background-color:#f8f9fa;
+    border-radius:10px;
+    margin:5px 0;
+    padding:10px;
 }
